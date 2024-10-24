@@ -1,36 +1,32 @@
 # Create DevUser
 aws iam create-user --user-name DevUser
 
-# Create TestUser
-aws iam create-user --user-name TestUser
 
-# Create AdminUser
-aws iam create-user --user-name AdminUser
 
 
 # Create Developers group
 aws iam create-group --group-name Developers
 
-# Create Testers group
-aws iam create-group --group-name Testers
 
-# Create Administrators group
-aws iam create-group --group-name Administrators
 
 
 # Add DevUser to Developers group
 aws iam add-user-to-group --user-name DevUser --group-name Developers
 
-# Add TestUser to Testers group
-aws iam add-user-to-group --user-name TestUser --group-name Testers
 
-# Add AdminUser to Administrators group
-aws iam add-user-to-group --user-name AdminUser --group-name Administrators
+#attach the policy to user
+aws iam attach-group-policy --group-name Developers --policy-arn arn:aws:iam::aws:policy/DevelopersPolicy
+
+
 
 
 
 # Attach an inline policy directly to the Developers group
 aws iam create-policy --policy-name DevelopersEC2ReadAccess --policy-document "{ \"Version\": \"2012-10-17\", \"Statement\": [ { \"Effect\": \"Allow\", \"Action\": [ \"ec2:DescribeInstances\", \"ec2:DescribeVolumes\", \"ec2:DescribeSecurityGroups\", \"ec2:DescribeImages\", \"ec2:DescribeSnapshots\" ], \"Resource\": \"*\" } ] }"
+
+
+
+
 
 
 # Create the role with trust policy and attach an inline policy in one command
