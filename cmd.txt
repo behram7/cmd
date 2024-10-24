@@ -34,6 +34,22 @@ aws iam create-policy --policy-name DevelopersEC2ReadAccess --policy-document "{
 
 
 # Create the role with trust policy and attach an inline policy in one command
+
+
+aws iam create-role --role-name S3ReadAccessRole --assume-role-policy-document file://trust-policy.json
+
+aws iam put-role-policy --role-name S3ReadAccessRole --policy-name InlineS3ReadAccessPolicy --policy-document file://inline-s3-read-policy.json
+
+
+
+
+
+
+
+
+
+
+
 aws iam create-role --role-name S3ReadRole --assume-role-policy-document '{
   "Version": "2012-10-17",
   "Statement": [
@@ -58,6 +74,24 @@ aws iam create-role --role-name S3ReadRole --assume-role-policy-document '{
     }
   ]
 }'
+
+
+
+# Create trust policy for S3 read access role (if not already created)
+aws iam create-role --role-name S3ReadAccessRole --assume-role-policy-document file://trust-policy.json
+
+# Attach the inline policy to the role (if not already attached)
+aws iam put-role-policy --role-name S3ReadAccessRole --policy-name InlineS3ReadAccessPolicy --policy-document file://inline-s3-read-policy.json
+
+# Create assume role policy document and attach it to the user
+aws iam put-user-policy --user-name <USERNAME> --policy-name AllowAssumeS3ReadRole --policy-document file://assume-role-policy.json
+
+
+aws sts assume-role --role-arn arn:aws:iam::<YOUR_ACCOUNT_ID>:role/S3ReadAccessRole --role-session-name MySession
+
+
+
+
 
 
 # Enable AWS Access Analyzer
