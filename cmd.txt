@@ -1,0 +1,152 @@
+# Create DevUser
+aws iam create-user --user-name DevUser
+
+# Create TestUser
+aws iam create-user --user-name TestUser
+
+# Create AdminUser
+aws iam create-user --user-name AdminUser
+
+
+# Create Developers group
+aws iam create-group --group-name Developers
+
+# Create Testers group
+aws iam create-group --group-name Testers
+
+# Create Administrators group
+aws iam create-group --group-name Administrators
+
+
+# Add DevUser to Developers group
+aws iam add-user-to-group --user-name DevUser --group-name Developers
+
+# Add TestUser to Testers group
+aws iam add-user-to-group --user-name TestUser --group-name Testers
+
+# Add AdminUser to Administrators group
+aws iam add-user-to-group --user-name AdminUser --group-name Administrators
+
+
+
+# Attach an inline policy directly to the Developers group
+aws iam put-group-policy \
+  --group-name Developers \
+  --policy-name DevelopersInlinePolicy \
+  --policy-document '{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "ec2:Describe*",
+          "s3:Get*",
+          "s3:List*"
+        ],
+        "Resource": "*"
+      }
+    ]
+  }'
+
+
+
+# Attach an inline policy directly to the Testers group
+aws iam put-group-policy \
+  --group-name Testers \
+  --policy-name TestersInlinePolicy \
+  --policy-document '{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "ec2:Describe*",
+          "s3:Get*",
+          "s3:List*",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ],
+        "Resource": "*"
+      }
+    ]
+  }'
+
+
+
+# Attach an inline policy directly to the Administrators group for full access
+aws iam put-group-policy \
+  --group-name Administrators \
+  --policy-name AdministratorsInlinePolicy \
+  --policy-document '{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": "*",
+        "Resource": "*"
+      }
+    ]
+  }'
+
+# Create the role with trust policy and attach an inline policy in one command
+aws iam create-role --role-name S3ReadRole --assume-role-policy-document '{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}' && aws iam put-role-policy --role-name S3ReadRole --policy-name S3ReadAccessPolicy --policy-document '{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:Get*",
+        "s3:List*"
+      ],
+      "Resource": "*"
+    }
+  ]
+}'
+
+
+# Enable AWS Access Analyzer
+aws accessanalyzer create-analyzer --analyzer-name MyAnalyzer --type ACCOUNT
+
+
+
+aws iam generate-credential-report
+
+
+
+aws iam get-credential-report
+
+
+
+7.2. Configure AWS CLI with your AWS account credentials
+   ```
+   aws configure
+   ```
+
+7.3. Verify AWS CLI installation and configuration
+   ```
+   aws sts get-caller-identity
+   ```
+
+### 8. Additional AWS CLI Commands for IAM
+
+8.1. List all IAM users with their creation date
+   ```
+   aws iam list-users --query 'Users[*].[UserName,CreateDate]' --output table
+   ```
+
+8.2. List all IAM roles and their associated policies
+   ```
+   aws iam list-roles --query 'Roles[*].[RoleName,PolicyNames]' --output table
+   ```
+
